@@ -34,6 +34,13 @@ export const courseSchema = new Schema<ICourse>(
       type: Number,
       required: [true, 'Course price is required'],
       min: [0, 'Price cannot be negative'],
+      set: (v: number) => Math.round(v*100)/100,
+      validate: {
+        validator: function (v) {
+          return /^\d+(\.\d{1,2})?$/.test(v.toString());
+        },
+        message: 'Price can have at most two decimal places'
+      }
   },
     instrID: {
       type: Schema.Types.ObjectId,

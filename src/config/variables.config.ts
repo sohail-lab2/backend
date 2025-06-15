@@ -21,6 +21,17 @@ const ConfigSchema = z.object({
   CASHFREE_APP_ID: z.string().default(''),
   CASHFREE_SECRET_KEY: z.string().default(''),
   CASHFREE_API_VERSION: z.string().default('2022-09-01'),
+  FIREBASE_TYPE: z.string(),
+  FIREBASE_PROJECT_ID: z.string(),
+  FIREBASE_PRIVATE_KEY_ID: z.string(),
+  FIREBASE_PRIVATE_KEY: z.string(),
+  FIREBASE_CLIENT_EMAIL: z.string(),
+  FIREBASE_CLIENT_ID: z.string(),
+  FIREBASE_AUTH_URI: z.string(),
+  FIREBASE_TOKEN_URI: z.string(),
+  FIREBASE_AUTH_PROVIDER_X509_CERT_URL: z.string(),
+  FIREBASE_CLIENT_X509_CERT_URL: z.string(),
+  FIREBASE_UNIVERSE_DOMAIN: z.string(),
 });
 
 const parsedConfig = ConfigSchema.safeParse(process.env);
@@ -48,16 +59,16 @@ export const config = {
   cashfreeSecretKey: parsedConfig.data.CASHFREE_SECRET_KEY,
   cashfreeApiVersion: parsedConfig.data.CASHFREE_API_VERSION,
   firebase: {
-    type: process.env.FIREBASE_TYPE,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    privateKeyId: process.env.FIREBASE_PRIVATE_KEY_ID,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    clientId: process.env.FIREBASE_CLIENT_ID,
-    authUri: process.env.FIREBASE_AUTH_URI,
-    tokenUri: process.env.FIREBASE_TOKEN_URI,
-    authProviderX509CertUrl: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-    clientX509CertUrl: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-    universeDomain: process.env.FIREBASE_UNIVERSE_DOMAIN
-  }
+    type: parsedConfig.data.FIREBASE_TYPE,
+    projectId: parsedConfig.data.FIREBASE_PROJECT_ID,
+    privateKeyId: parsedConfig.data.FIREBASE_PRIVATE_KEY_ID,
+    privateKey: parsedConfig.data.FIREBASE_PRIVATE_KEY,
+    clientEmail: parsedConfig.data.FIREBASE_CLIENT_EMAIL,
+    clientId: parsedConfig.data.FIREBASE_CLIENT_ID,
+    authUri: parsedConfig.data.FIREBASE_AUTH_URI,
+    tokenUri: parsedConfig.data.FIREBASE_TOKEN_URI,
+    authProviderX509CertUrl: parsedConfig.data.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+    clientX509CertUrl: parsedConfig.data.FIREBASE_CLIENT_X509_CERT_URL,
+    universeDomain: parsedConfig.data.FIREBASE_UNIVERSE_DOMAIN,
+  },
 } as const;

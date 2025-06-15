@@ -5,6 +5,8 @@ import routesV1 from './routes';
 import { loggerMiddleware } from './middleware/logger';
 import helmet from 'helmet';
 import { config } from './config/variables.config';
+import { apiLimiter } from './services/rateLimiter.service';
+
 const app = express();
 
 // Middlewares
@@ -20,10 +22,27 @@ app.use(
 app.use(express.json());
 app.use(loggerMiddleware());
 
+// Apply rate limiting to all routes
+app.use('/api/v1', apiLimiter);
+
 // TODO to be handle by ngix
-app.use('/profiles', express.static(config.photoUploadPath));
-app.use('/courses', express.static(config.coursePath));
-app.use('/certificates', express.static(config.certificateStoragePath));
+app.use('/profiles', express.static(config.photoUploadPath, {
+  setHeaders: (res) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+app.use('/courses', express.static(config.coursePath, {
+  setHeaders: (res) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+app.use('/certificates', express.static(config.certificateStoragePath, {
+  setHeaders: (res) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
 
 // Routes
 app.use('/api/v1', routesV1);

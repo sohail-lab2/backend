@@ -8,12 +8,18 @@ import {
   getCourses,
   updateCourse,
   deleteCourse,
-  grantCourseToStudent
+  grantCourseToStudent,
+  createOrder,
+  paymentHook
 } from '../controllers/course.controller';
 import { UserRoles } from '../schemas';
 import { uploadCourseBanner } from '../middleware/upload';
+import { courseLimiter, paymentLimiter } from '../services';
 
 const courseRoutes = express.Router();
+
+// limiting public course fetching
+courseRoutes.use('/public', courseLimiter);
 
 courseRoutes.get("/public", getPublicCourse);
 courseRoutes.get("/public/:id", getPublicCourseById);
@@ -54,11 +60,24 @@ courseRoutes.delete('/:id',
   deleteCourse
 );
 
-// courseRoutes.post(
-//   '/:id/purchase',
-//   authenticate,
-//   authorize(['student']),
-//   incrementPurchaseCount,
-// );
+courseRoutes.post(
+  '/:id/purchase',
+  paymentLimiter,
+  authorize([UserRoles[0]]),
+  createOrder,
+);
+
+courseRoutes.get(
+  '/:id/purchased',
+  paymentLimiter,
+  authorize([UserRoles[0]]),
+  createOrder,
+);
+
+courseRoutes.post(
+  '/:id/webhook',
+  authorize([UserRoles[0]]),
+  paymentHook,
+);
 
 export default courseRoutes;

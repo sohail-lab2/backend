@@ -2,14 +2,16 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { Certificate, User } from '../models';
 import { cleanMongoData } from '../services';
-import { NotFoundError } from '../middleware/errorHandler';
+import { AuthenticationError, NotFoundError } from '../middleware/errorHandler';
+import { getCertificatesForUser } from '../services/certificate.service';
 
 export const getAllCertificates = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const mUser = await User.findOne({uid: req.user?.uid}).lean();
-        const certificates = await Certificate.find({ user: mUser?._id }).populate('course', 'name description');
+        const mUser = await User.findOne({ uid: req.user?.uid }).lean();
+        if(!mUser) throw new AuthenticationError();
+        const certificates = await getCertificatesForUser(mUser._id.toString());
         if (!certificates || certificates.length === 0) {
-            throw new NotFoundError('No certificates found ');
+            throw new NotFoundError('No certificates found');
         }
         res.status(200).json(cleanMongoData(certificates));
     } catch (error) {

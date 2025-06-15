@@ -19,7 +19,7 @@ export const newStudent = async (
       throw new AppError('User ID is required', 400, true);
     }
 
-    await auth.setCustomUserClaims(req.user.uid, { role: UserRoles[3] });
+    await auth.setCustomUserClaims(req.user.uid, { role: UserRoles[0] });
     const user = await auth.getUser(req.user.uid);
     const { displayName, photoURL, phoneNumber} = user;
 
@@ -33,7 +33,7 @@ export const newStudent = async (
       name: displayName,
       photoUrl: photoURL,
       contactNumber: phoneNumber,
-      role: UserRoles[3],
+      role: UserRoles[0],
     });
     res.status(201).json({ message: 'Student role assigned and created' });
   } catch (err) {
@@ -144,6 +144,7 @@ export const createUser = async (
       uid: userCredential.uid
     };
     await auth.setCustomUserClaims(finalUserData.uid, { role: finalUserData.role });
+    await auth.updateUser(finalUserData.uid, { emailVerified: true}); // marking all admin created mail as verified
     await User.create(finalUserData);
     res.status(201).json({ message: 'User created' });
   } catch (err) {
@@ -179,7 +180,7 @@ export const getAllUsers = async (
   try {
     const listUsersResult = await auth.listUsers();
 
-    // If the requesting user is a COURSE_MANAGER, restrict viewable roles
+    // If the requesting user is a COURSE-MANAGER, restrict viewable roles
     const requesterRole = req.user?.role;
 
     const allowedRolesForManager = [UserRoles[0], UserRoles[1]]; // STUDENT, INSTRUCTOR

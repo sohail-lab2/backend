@@ -1,0 +1,7 @@
+will be removed in prod
+
+completed certifcate process in: 1.21s
+Message of BullMQ:-
+
+✅ Certificate generation complete for user Alice99
+🎉 Job 602 completed

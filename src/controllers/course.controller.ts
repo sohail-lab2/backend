@@ -1,13 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
-import { Chapter, Course, Module, Payment, User } from '../models';
+import { Chapter, Course, Module, Payment, School, User } from '../models';
 import { Types } from 'mongoose';
-import { AppError, AuthorizationError, NotFoundError } from '../middleware/errorHandler';
+import { AppError, AuthenticationError, AuthorizationError, NotFoundError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { CourseInput, courseValidationSchema, paymentValidationSchema, UserRoles } from '../schemas';
 import { cleanMongoData } from '../services/dataCleaner.service';
 import fs from 'fs';
+import { CashFree } from '../config/cashfree.config';
 import path from 'path';
 import { config } from '../config/variables.config';
+import { auth } from '../config/firebase.config';
+import {v4 as uuid} from 'uuid';
+import { CreateOrderRequest, PaymentEntity, PaymentEntityPaymentStatusEnum } from 'cashfree-pg';
 
 export const getPublicCourse = async (_req: Request, res: Response, next: NextFunction) => {  
   try {
@@ -320,50 +324,116 @@ export const grantCourseToStudent = async(req: AuthRequest, res: Response, next:
   }
 }
 
-// TODO review and update rating
-// TODO purchase count update
-// export const updateCourseRating = async (req: Request, res: Response) => {
-//   try {
-//     const { rating } = req.body;
-//     const course = await Course.findById(req.params.id);
+export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try{
+    const {id} = req.params;
+    
+    const mUser = await User.findOne({uid: req.user?.uid}).lean();
+    if(!mUser) throw new AuthenticationError();
+    if (!mUser.contactNumber) {
+      throw new AppError('User does not have a phone number', 400, true);
+    }
 
-//     if (!course) {
-//       return res.status(404).json({ error: 'Course not found' });
-//     }
+    const course = await Course.findById(id).lean();
+    if(!course) throw new NotFoundError('Course not exist');
+    const customer_email = (await auth.getUser(req.user?.uid!)).email;
 
-//     // Calculate new aggregate rating
-//     const totalRatings = course.reviews.length;
-//     const newAggregateRating =
-//       (course.aggregateRating * totalRatings + rating) / (totalRatings + 1);
+    const hostname = req.hostname + (config.nodeEnv === 'development') ? ':5000' : '';
 
-//     const updatedCourse = await Course.findByIdAndUpdate(
-//       req.params.id,
-//       { $set: { aggregateRating: newAggregateRating } },
-//       { new: true },
-//     );
+    let orderPayload: CreateOrderRequest = {
+      order_id: `order_${uuid()}`,
+      order_currency: 'INR',
+      order_amount: Math.round(course.price * 100) / 100,
+      customer_details: {
+        customer_id: mUser._id.toString(),
+        customer_email,
+        customer_phone: mUser.contactNumber,
+      },
+      order_meta: {
+        return_url: `${req.protocol}://${hostname}/checkout?order_id={order_id}`,
+        notify_url: `${req.protocol}://${hostname}/api/v1/courses/${course._id.toString()}/webhook`,
+      }
+    };
 
-//     return res.json(updatedCourse);
-//   } catch (error) {
-//     return res.status(500).json({ error: 'Error updating course rating' });
-//   }
-// };
+    // SChool specific price
+    if (mUser.schoolName) {
+      const school = await School.findOne({ name: mUser.schoolName });
+      const customPrice = school?.coursesPricing.find(cp => cp.courseId.toString() === id)?.price;
+      if (customPrice !== undefined) {
+        orderPayload.order_amount = customPrice;
+      }
+    }
 
-// export const incrementPurchaseCount = async (req: Request, res: Response) => {
-//   try {
-//     const course = await Course.findById(req.params.id);
 
-//     if (!course) {
-//       return res.status(404).json({ error: 'Course not found' });
-//     }
-//     // Need to handle the purchase using cashFree and uper maping
-//     const updatedCourse = await Course.findByIdAndUpdate(
-//       req.params.id,
-//       { $inc: { buysCnt: 1 } },
-//       { new: true },
-//     );
+    const response = await CashFree.PGCreateOrder(orderPayload);
+    res.status(201).json(response.data);
+  }catch(err){
+    next(err);
+  }
+}
 
-//     return res.json(updatedCourse);
-//   } catch (error) {
-//     return res.status(500).json({ error: 'Error updating purchase count' });
-//   }
-// };
+export const checkPayment = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const order_id = req.query.order_id;
+    const courseId = req.params.id;
+    if (!order_id || !courseId) {
+      throw new AppError('Missing order ID or course ID', 400, true);
+    }
+    const mUser = await User.findOne({uid: req.user?.uid}).lean();
+    if(!mUser) throw new AuthenticationError();
+    const orderDetails: PaymentEntity[] = (await CashFree.PGOrderFetchPayments(order_id!.toString())).data;
+    const successfulPayment = orderDetails.find(payment => payment.payment_status === PaymentEntityPaymentStatusEnum.SUCCESS);
+    if (!successfulPayment) {
+      throw new AppError('No successful payment found', 400, true);
+    }
+
+    // Add entry to the payment model
+    const payment = new Payment({
+      userId: mUser._id,
+      courseId,
+      amount: successfulPayment.payment_amount,
+      method: 'ONLINE',
+      paymentId: successfulPayment.cf_payment_id
+    });
+    await payment.save();
+
+    // Increase buy count in course
+    await Course.findByIdAndUpdate(courseId, { $inc: { buysCnt: 1 } });
+
+    res.status(200).json({ message: 'Payment successful' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const paymentHook = async (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    const courseId = req.params.id;
+    if (!courseId) {
+      throw new AppError('Missing course ID', 400, true);
+    }
+    if (CashFree.PGVerifyWebhookSignature(req.headers["x-webhook-signature"] as string, (req as any).rawBody, req.headers["x-webhook-timestamp"] as string)) {
+      const webhookData = JSON.parse((req as any).rawBody);
+      const successfulPayment = webhookData.data.payment;
+      if (successfulPayment.payment_status === PaymentEntityPaymentStatusEnum.SUCCESS) {
+        const mUser = await User.findById(webhookData.data.customer_details.customer_id).lean();
+        if (mUser) {
+          const existingPayment = await Payment.findOne({ courseId, userId: mUser._id });
+          if (!existingPayment) {
+            const payment = new Payment({
+              userId: mUser._id,
+              courseId,
+              amount: successfulPayment.payment_amount,
+              method: 'ONLINE',
+              paymentId: successfulPayment.cf_payment_id
+            });
+            await payment.save();
+            await Course.findByIdAndUpdate(courseId, { $inc: { buysCnt: 1 } });
+          }
+        }
+      }
+    }
+  }catch(err){
+    next(err);
+  }
+}

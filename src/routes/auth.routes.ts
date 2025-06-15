@@ -3,8 +3,11 @@ import { newStudent, getUserDetail, createUser, updateUserDetails, updateStudent
 import { authenticate, authorize } from '../middleware/auth';
 import { UserRoles } from '../schemas';
 import { uploadProfilePhoto } from '../middleware/upload';
+import { authLimiter } from '../services/rateLimiter.service';
 
 const authRouter: Router = Router();
+
+authRouter.use('/register', authLimiter);
 
 authRouter.use(authenticate);
 

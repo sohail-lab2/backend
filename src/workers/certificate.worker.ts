@@ -1,22 +1,22 @@
 import { Worker } from 'bullmq';
-import { redisOptions } from '../config/redis.config';
+import { redisClient } from '../config/redis.config';
 import { generateCertificate } from '../services/certificate.service';
 
 export const worker = new Worker(
   'certificateQueue',
   async job => {
     const {
+      studentId,
+      courseId,
       studentName,
       courseName,
       completionDate,
-      instructorName,
-      path,
-     } = job.data;
+    } = job.data;
     console.log(`🎓 Generating certificate for user ${studentName} - course ${courseName}`);
-    await generateCertificate(studentName, courseName, instructorName , completionDate, path);
+    await generateCertificate(studentId, courseId, studentName, courseName, completionDate);
     console.log(`✅ Certificate generation complete for user ${studentName}`);
   },
-  { connection: redisOptions }
+  { connection: redisClient.duplicate() }
 );
 
 worker.on('completed', (job) => {

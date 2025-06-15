@@ -9,8 +9,10 @@ import { Review } from './review.model';
 import { Certificate } from './certificate.model';
 import { Question } from './question.model';
 import { QuizAttempt } from './quizAttempt.model';
+import { School } from './school.model';
 export {
     User,
+    School,
     Course,
     Chapter,
     Module,

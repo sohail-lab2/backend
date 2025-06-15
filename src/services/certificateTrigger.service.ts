@@ -1,22 +1,5 @@
-import { certificateQueue } from '../queues/certificate.queue';
 import { Chapter, Quiz, QuizAttempt } from '../models';
-
-const enqueueCertificateJob = async (
-  userId: string,
-  studentName: string,
-  courseId: string,
-  courseName: string,
-  avgScore: number,
-) => {
-    const now = new Date();
-  await certificateQueue.add('generateCertificate', {
-    studentName,
-    courseName,
-    instructorName,
-    path,
-    completionDate: now,
-  });
-};
+import { enqueueCertificateJob } from '../jobs/certificate.job';
 
 export const evaluateCourseCompletion = async (userId: string, studentName: string, courseId: string, courseName: string) => {
     const chapters = await Chapter.find({ courseId }).select('_id').lean();
@@ -40,7 +23,7 @@ export const evaluateCourseCompletion = async (userId: string, studentName: stri
   
       // 🎉 All completed and >= 80% score
     if (avgPercentage >= 80) {
-      await enqueueCertificateJob(userId, studentName, courseId, courseName, avgPercentage);
+      await enqueueCertificateJob(userId, studentName, courseId, courseName);
     }
   };
   

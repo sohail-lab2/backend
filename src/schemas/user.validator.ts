@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const UserRoles = ['STUDENT', 'INSTRUCTOR', 'COURSE_MANAGER', "ADMIN"] as const;
+export const UserRoles = ['STUDENT', 'INSTRUCTOR', 'COURSE-MANAGER', "ADMIN"] as const;
 export type UserRole = (typeof UserRoles)[number];
 
 export const baseUserValidationSchema = z.object({

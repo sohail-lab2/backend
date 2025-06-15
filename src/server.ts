@@ -1,6 +1,7 @@
 import app from './app';
 import { config } from './config/variables.config';
 import { connectDB } from './config/database.config';
+import './queues/certificate.queue';
 import { NetworkInterfaceInfo, networkInterfaces } from 'os';
 
 async function startServer() {
