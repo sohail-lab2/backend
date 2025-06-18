@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { config } from './variables.config';
 
 const serviceAccount = {
+<<<<<<< HEAD
   type: config.firebase.type,
   project_id: config.firebase.projectId,
   private_key_id: config.firebase.privateKeyId,
@@ -17,6 +18,23 @@ const serviceAccount = {
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+=======
+  type: config.firebase.type!,
+  project_id: config.firebase.projectId!,
+  private_key_id: config.firebase.privateKeyId!,
+  private_key: config.firebase.privateKey,
+  client_email: config.firebase.clientEmail,
+  client_id: config.firebase.clientId!,
+  auth_uri: config.firebase.authUri!,
+  token_uri: config.firebase.tokenUri!,
+  auth_provider_x509_cert_url: config.firebase.authProviderX509CertUrl!,
+  client_x509_cert_url: config.firebase.clientX509CertUrl!,
+  universe_domain: config.firebase.universeDomain!
+} as admin.ServiceAccount;
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 });
 
 export const auth = admin.auth();

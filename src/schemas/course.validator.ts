@@ -12,6 +12,10 @@ export const courseValidationSchema = z.object({
     .max(2000, 'Course description cannot exceed 2000 characters')
     .trim(),
   price: z.preprocess((val) => parseFloat(val as string), z.number().min(0, 'Price cannot be negative')),
+<<<<<<< HEAD
+=======
+  // instrID: objectIdValidator(User, "instrId"), gurentee as internally generated
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
   aggregateRating: z.number()
     .min(0, 'Rating cannot be less than 0')
     .max(5, 'Rating cannot be more than 5')
@@ -22,11 +26,15 @@ export const courseValidationSchema = z.object({
     .optional()
     .default(0),
   bannerUrl: z.string().optional(),
+<<<<<<< HEAD
   isPublished: z.preprocess((val) => {
     if (typeof val === 'boolean') return val;
     if (typeof val === 'string') return val === 'true';
     return false;
   }, z.boolean().optional().default(false)),
+=======
+  isPublished: z.boolean().optional().default(false),
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
   chapters: z.array(objectIdValidator(Chapter, 'Chapter id(s)')).optional().default([]),
   reviews: z.array(objectIdValidator(Review, "Review id(s)")).optional().default([]),
 });

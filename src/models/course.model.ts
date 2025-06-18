@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Document, Types, Schema } from 'mongoose';
 import mongoose from 'mongoose';
 import { deleteFile } from '../services';
@@ -5,6 +6,12 @@ import path from 'path';
 import { config } from '../config/variables.config';
 
 export type ICourse = Document & {
+=======
+import { Document, Types } from 'mongoose';
+import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
+export interface ICourse extends Document {
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
   name: string;
   description: string;
   price: number;
@@ -15,7 +22,11 @@ export type ICourse = Document & {
   isPublished: boolean;
   chapters: Types.ObjectId[];
   reviews: Types.ObjectId[];
+<<<<<<< HEAD
 };
+=======
+}
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 
 export const courseSchema = new Schema<ICourse>(
   {
@@ -37,14 +48,24 @@ export const courseSchema = new Schema<ICourse>(
       type: Number,
       required: [true, 'Course price is required'],
       min: [0, 'Price cannot be negative'],
+<<<<<<< HEAD
       set: (v: number) => Math.round(v * 100) / 100,
       validate: {
         validator: function (v: number) {
+=======
+      set: (v: number) => Math.round(v*100)/100,
+      validate: {
+        validator: function (v) {
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
           return /^\d+(\.\d{1,2})?$/.test(v.toString());
         },
         message: 'Price can have at most two decimal places'
       }
+<<<<<<< HEAD
     },
+=======
+  },
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
     instrID: {
       type: Schema.Types.ObjectId,
       required: [true, 'Instructor ID is required'],
@@ -62,8 +83,13 @@ export const courseSchema = new Schema<ICourse>(
       max: [5, 'Rating cannot be more than 5'],
     },
     isPublished: {
+<<<<<<< HEAD
       type: Boolean,
       default: false
+=======
+        type: Boolean,
+        default: false
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
     },
     buysCnt: {
       type: Number,
@@ -90,6 +116,7 @@ export const courseSchema = new Schema<ICourse>(
   },
 );
 
+<<<<<<< HEAD
 courseSchema.index({ instrID: 1 });
 courseSchema.index({ name: 'text', description: 'text' });
 courseSchema.index({ price: 1 });
@@ -145,5 +172,14 @@ courseSchema.pre('deleteOne', { document: true, query: false }, async function (
     next(error);
   }
 });
+=======
+// Indexes for better query performance
+courseSchema.index({ instrID: 1 }); // For instructor-based queries
+courseSchema.index({ name: 'text', description: 'text' }); // For text search
+courseSchema.index({ price: 1 }); // For price-based sorting and filtering
+courseSchema.index({ aggregateRating: -1 }); // For rating-based sorting
+courseSchema.index({ buysCnt: -1 }); // For popularity-based sorting
+courseSchema.index({ createdAt: -1 }); // For time-based sorting 
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 
 export const Course = mongoose.model<ICourse>('Course', courseSchema);

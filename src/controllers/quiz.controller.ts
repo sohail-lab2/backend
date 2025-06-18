@@ -1,12 +1,17 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
+<<<<<<< HEAD
 import { AuthenticationError, AuthorizationError, NotFoundError, ConflictError } from '../middleware/errorHandler';
+=======
+import { AuthenticationError, AuthorizationError, NotFoundError } from '../middleware/errorHandler';
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 import {Chapter, Payment, Question, Quiz, QuizAttempt, User} from '../models';
 import { cleanMongoData } from '../services';
 import { questionValidationSchema, quizAttemptValidationSchema, quizValidationSchema, UserRoles } from '../schemas';
 import { Types } from 'mongoose';
 import { evaluateCourseCompletion } from '../services/certificateTrigger.service';
 
+<<<<<<< HEAD
 export const getQuiz = async (
   req: AuthRequest,
   res: Response,
@@ -29,6 +34,8 @@ export const getQuiz = async (
 };
 
 
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 export const createQuiz = async (
   req: AuthRequest,
   res: Response,
@@ -42,6 +49,7 @@ export const createQuiz = async (
     if(req.user?.role! === UserRoles[1]){
       const mUser = await User.findOne({uid: req.user?.uid!});
       if(!mUser) throw new AuthenticationError(); 
+<<<<<<< HEAD
       if((chapter.courseId as any).instrID.toString() !== (mUser._id as any).toString()) throw new AuthorizationError('You can not add quiz to other\'s course.');
     }
 
@@ -55,6 +63,12 @@ export const createQuiz = async (
     // Update chapter with the new quiz
     await Chapter.findByIdAndUpdate(validatedData.chapterId, { quiz: quiz._id });
     
+=======
+      if((chapter.courseId as any).instrID !== mUser._id) throw new AuthorizationError('You can not add quiz to other\'s course.');
+    }
+
+    const quiz = await Quiz.create(validatedData);
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
     res.status(201).json(cleanMongoData(quiz.toJSON()));
   } catch (error) {
     next(error);
@@ -81,6 +95,7 @@ export const deleteQuiz = async (
       }
     }
 
+<<<<<<< HEAD
     // Delete all questions associated with the quiz
     await Question.deleteMany({ quizId });
 
@@ -93,6 +108,10 @@ export const deleteQuiz = async (
     // Delete the quiz
     await Quiz.findByIdAndDelete(quizId);
 
+=======
+    await Quiz.findByIdAndDelete(quizId);
+    await Chapter.findByIdAndUpdate(quiz.chapterId, { $unset: { quiz: '' } });
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
     res.status(204).send();
   } catch (error) {
     next(error);
@@ -172,7 +191,11 @@ export const deleteQuestionFromQuiz = async (req: AuthRequest, res: Response, ne
   }
 };
 
+<<<<<<< HEAD
 export const submitQuizAttempt = async (
+=======
+export const attemptQuiz = async (
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
   req: AuthRequest,
   res: Response,
   next: NextFunction,
@@ -182,7 +205,11 @@ export const submitQuizAttempt = async (
     const mUser = await User.findOne({uid: req.user?.uid}).lean();
     if(!mUser) throw new AuthenticationError();
 
+<<<<<<< HEAD
     const validatedData = await quizAttemptValidationSchema.parseAsync(req.body);
+=======
+    const validatedData = quizAttemptValidationSchema.parse(req.body);
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 
     const quiz = await Quiz.findById(quizId).populate('questions').lean();
     if (!quiz) return next(new NotFoundError('Quiz not found'));
@@ -235,12 +262,16 @@ export const submitQuizAttempt = async (
     existingAttempt.completedAt = now;
     await existingAttempt.save();
 
+<<<<<<< HEAD
     await evaluateCourseCompletion(
       mUser._id.toString(),
       mUser.name || mUser._id.toString(),
       (chapter.courseId as any)._id.toString(),
       (chapter.courseId as any).name
     );
+=======
+    await evaluateCourseCompletion(mUser.id , (mUser.name || mUser.id), chapter.courseId.toString(), (chapter.courseId as any).name);
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
     res.status(200).json({
       score: percentageScore,
       passed: percentageScore >= quiz.passingPercentage,
@@ -254,9 +285,15 @@ export const submitQuizAttempt = async (
 export const startQuizAttempt = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { quizId } = req.params;
+<<<<<<< HEAD
     const mUser = await User.findOne({uid: req.user?.uid}).lean();
     if(!mUser) throw new AuthenticationError();
     const userId = mUser._id;
+=======
+    const userId = req.user?.uid;
+    const mUser = await User.findOne({uid: userId}).lean();
+    if(!mUser) throw new AuthenticationError();
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 
     const quiz = await Quiz.findById(quizId).populate('questions', '-correctAnswer').lean();
     if (!quiz) throw new NotFoundError('Quiz not found');
@@ -300,6 +337,10 @@ export const startQuizAttempt = async (req: AuthRequest, res: Response, next: Ne
     next(error);
   }
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 export const getQuizResult = async (
   req: AuthRequest,
   res: Response,
@@ -335,6 +376,7 @@ export const getQuizResult = async (
   } catch (error) {
     next(error);
   }
+<<<<<<< HEAD
 };
 
 export const updateQuiz = async (
@@ -377,3 +419,6 @@ export const updateQuiz = async (
     next(error);
   }
 };
+=======
+};
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc

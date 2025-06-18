@@ -47,4 +47,8 @@ reviewSchema.index({courseId:1, rating: 1});
 // Add text index for comment search
 reviewSchema.index({ comment: 'text' });
 
+<<<<<<< HEAD
+=======
+;
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 export const Review = mongoose.model<IReview>('Review', reviewSchema);

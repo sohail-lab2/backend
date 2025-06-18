@@ -9,7 +9,10 @@ import progressRoutes from './progress.routes';
 import reviewRoutes from './review.routes';
 import analyticsRouter from './analytics.routes';
 import schoolRouter from './school.routes';
+<<<<<<< HEAD
 import contactRoutes from './contact.routes';
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 
 const routerV1 = Router();
 
@@ -27,7 +30,12 @@ routerV1.use('/reviews', reviewRoutes);
 routerV1.use('/quizzes', quizRouter);
 routerV1.use('/certificates', certificateRouter);
 routerV1.use('/schools', schoolRouter);
+<<<<<<< HEAD
 routerV1.use('/contact', contactRoutes);
 
 export default routerV1;
 
+=======
+
+export default routerV1;
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc

@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import fs from 'fs';
 
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 export function cleanMongoData<T extends Record<string, any>>(data: T | T[]): any {
   const clean = (item: any): any => {
     if (Array.isArray(item)) {
@@ -53,6 +56,7 @@ export function cleanMongoData<T extends Record<string, any>>(data: T | T[]): an
 
   return Array.isArray(data) ? data.map(clean) : clean(data);
 }
+<<<<<<< HEAD
 
 export const deleteFile = (filePath: string) => {
   try {
@@ -66,3 +70,5 @@ export const deleteFile = (filePath: string) => {
     }
   }
 };
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc

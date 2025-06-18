@@ -21,6 +21,7 @@ const ConfigSchema = z.object({
   CASHFREE_APP_ID: z.string().default(''),
   CASHFREE_SECRET_KEY: z.string().default(''),
   CASHFREE_API_VERSION: z.string().default('2022-09-01'),
+<<<<<<< HEAD
   GOOGLE_SCRIPT_URL: z.string().url().optional(),
   GOOGLE_SCRIPT_VERIFICATION_CODE: z.string().optional(),
   // Firebase configuration
@@ -35,6 +36,19 @@ const ConfigSchema = z.object({
   FIREBASE_AUTH_PROVIDER_X509_CERT_URL: z.string().url(),
   FIREBASE_CLIENT_X509_CERT_URL: z.string().url(),
   FIREBASE_UNIVERSE_DOMAIN: z.string().default('googleapis.com'),
+=======
+  FIREBASE_TYPE: z.string(),
+  FIREBASE_PROJECT_ID: z.string(),
+  FIREBASE_PRIVATE_KEY_ID: z.string(),
+  FIREBASE_PRIVATE_KEY: z.string(),
+  FIREBASE_CLIENT_EMAIL: z.string(),
+  FIREBASE_CLIENT_ID: z.string(),
+  FIREBASE_AUTH_URI: z.string(),
+  FIREBASE_TOKEN_URI: z.string(),
+  FIREBASE_AUTH_PROVIDER_X509_CERT_URL: z.string(),
+  FIREBASE_CLIENT_X509_CERT_URL: z.string(),
+  FIREBASE_UNIVERSE_DOMAIN: z.string(),
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 });
 
 const parsedConfig = ConfigSchema.safeParse(process.env);
@@ -61,9 +75,12 @@ export const config = {
   cashfreeAppId: parsedConfig.data.CASHFREE_APP_ID,
   cashfreeSecretKey: parsedConfig.data.CASHFREE_SECRET_KEY,
   cashfreeApiVersion: parsedConfig.data.CASHFREE_API_VERSION,
+<<<<<<< HEAD
   googleScriptUrl: parsedConfig.data.GOOGLE_SCRIPT_URL,
   googleScriptVerificationCode: parsedConfig.data.GOOGLE_SCRIPT_VERIFICATION_CODE,
   // Firebase configuration
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
   firebase: {
     type: parsedConfig.data.FIREBASE_TYPE,
     projectId: parsedConfig.data.FIREBASE_PROJECT_ID,

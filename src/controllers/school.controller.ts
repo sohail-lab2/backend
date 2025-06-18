@@ -82,6 +82,7 @@ export const addCoursePriceForSchool = async (req: AuthRequest, res: Response, n
     next(error);
   }
 };
+<<<<<<< HEAD
 
 export const deleteSchool = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
@@ -93,3 +94,5 @@ export const deleteSchool = async (req: AuthRequest, res: Response, next: NextFu
     next(error);
   }
 };
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc

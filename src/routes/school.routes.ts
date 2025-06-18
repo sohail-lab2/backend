@@ -14,8 +14,11 @@ schoolRouter.post(
 
 schoolRouter.get('/', getSchools);
 
+<<<<<<< HEAD
 schoolRouter.delete('/:schoolId', getSchools);
 
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 schoolRouter.post(
   '/:schoolId/course-price',
   addCoursePriceForSchool

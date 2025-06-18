@@ -11,6 +11,7 @@ const app = express();
 
 // Middlewares
 app.use(helmet());
+<<<<<<< HEAD
 // app.use(
 //   cors({
 //     origin: config.frontendUrl,
@@ -22,6 +23,17 @@ app.use(helmet());
 app.use('/api/v1/courses/:id/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+=======
+app.use(
+  cors({
+    origin: config.frontendUrl,
+    methods: ['GET', 'POST', 'DELETE', 'PUT','PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'uid'],
+    credentials: true,
+  }),
+);
+app.use(express.json());
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 app.use(loggerMiddleware());
 
 // Apply rate limiting to all routes

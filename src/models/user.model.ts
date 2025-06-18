@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import mongoose, { Types, Document, Schema } from 'mongoose';
 import { UserRole, UserRoles } from '../schemas/user.validator';
 import { auth } from '../config/firebase.config';
@@ -21,13 +22,65 @@ export const mongooseUserSchema = new Schema<IUser>(
     role: { type: String, enum: UserRoles, required: true },
     contactNumber: {
       type: String,
+=======
+import mongoose, { Types } from 'mongoose';
+import { Document, Schema } from 'mongoose';
+import { UserRole, UserRoles } from '../schemas/user.validator';
+
+export interface IUser extends Document {
+  uid: string;
+  name?: string; 
+  photoUrl?: string;
+  role: UserRole;
+  contactNumber?: string;
+  schoolName?: string;  
+  studentClass?: string;
+  coursesCreated?: Types.ObjectId[];
+}
+
+// Mongoose schema
+export const mongooseUserSchema = new Schema<IUser>(
+  {
+    uid: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    name: {
+      type: String,
+      trim: false,
+    },
+    photoUrl: {
+      type: String,
+      required: false
+    },
+    role: {
+      type: String,
+      enum: UserRoles,
+      required: true,
+    },
+    contactNumber: {
+      type: String,
+      required: false,
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
       validate: {
         validator: (value: string) => /^\+?[1-9]\d{1,14}$/.test(value),
         message: (props) => `${props.value} is not a valid phone number!`,
       },
     },
+<<<<<<< HEAD
     schoolName: { type: String },
     studentClass: { type: String },
+=======
+    schoolName: {
+      type: String,
+      required: false,
+    },
+    studentClass: {
+      type: String,
+      required: false,
+    },
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
     coursesCreated: [
       {
         type: Schema.Types.ObjectId,
@@ -39,6 +92,7 @@ export const mongooseUserSchema = new Schema<IUser>(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+<<<<<<< HEAD
   }
 );
 
@@ -85,4 +139,14 @@ mongooseUserSchema.pre('deleteOne', { document: true, query: false }, async func
   }
 });
 
+=======
+  },
+);
+
+// Indexes
+mongooseUserSchema.index({ role: 1 });
+mongooseUserSchema.index({ name: 'text' });
+
+;
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 export const User = mongoose.model<IUser>('User', mongooseUserSchema);

@@ -20,7 +20,14 @@ export const progressValidationSchema = z.object({
     .default(ProgressStatuses[0]),
   completedAt: z.date()
     .optional(),
+<<<<<<< HEAD
   timeSpent: z.coerce.number().min(0, "Time spent cannot be negative"),
+=======
+  timeSpent: z.number()
+    .int()
+    .min(0, 'Time spent must be a non-negative integer')
+    .default(0),
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 });
 
 export type ProgressInput = z.infer<typeof progressValidationSchema>;

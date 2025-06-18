@@ -10,9 +10,13 @@ import {
   deleteCourse,
   grantCourseToStudent,
   createOrder,
+<<<<<<< HEAD
   paymentHook,
   checkPayment,
   getTop3Courses
+=======
+  paymentHook
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 } from '../controllers/course.controller';
 import { UserRoles } from '../schemas';
 import { uploadCourseBanner } from '../middleware/upload';
@@ -23,7 +27,10 @@ const courseRoutes = express.Router();
 // limiting public course fetching
 courseRoutes.use('/public', courseLimiter);
 
+<<<<<<< HEAD
 courseRoutes.get("/public/top3", getTop3Courses);
+=======
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 courseRoutes.get("/public", getPublicCourse);
 courseRoutes.get("/public/:id", getPublicCourseById);
 
@@ -74,7 +81,11 @@ courseRoutes.get(
   '/:id/purchased',
   paymentLimiter,
   authorize([UserRoles[0]]),
+<<<<<<< HEAD
   checkPayment,
+=======
+  createOrder,
+>>>>>>> df60681d70ae1bb524012301a45ca9880f84fbdc
 );
 
 courseRoutes.post(
